@@ -2,7 +2,7 @@
 <project name='Dempster Shafer Similarity Measures' default='main' basedir='.'>
    <description>
 <!-- This description is intentionally dedented, please leave it that way -->
-This is the primary build file for Dempter Shafer Theory.  It contains most of 
+This is the primary build file for the Dempter Shafer Theory library.  It contains most of 
 the standard build targets (all, clean, test, main, etc).
 
 For the most part you shouldn't have to edit build.xml.  Obviously if you're
@@ -50,14 +50,8 @@ ideas for what  you can do to make your life easier.
   </path>
   <path id='base.classpath'>
     <pathelement path='${build.dir}'/>
-    <pathelement path='${build.lib.dir}/guava-14.0.1.jar'/>
-    <pathelement path='${build.lib.dir}/javaclient2.jar'/>
-    <pathelement path='${build.lib.dir}/jcommon-1.0.16.jar'/>
-    <pathelement path='${build.lib.dir}/scala-compiler.jar'/>
-    <pathelement path='${build.lib.dir}/scala-library.jar'/>
-    <pathelement path='${build.lib.dir}/scala-reflect.jar'/>
-    <pathelement path='${build.lib.dir}/xercesImpl.jar'/>
-    <pathelement path='${build.lib.dir}/xmlunit-1.6.jar'/>
+    <pathelement path='${build.lib.dir}/junit-4.7.jar'/>
+    <pathelement path='${build.lib.dir}/commons-logging-1.1.2.jar'/>
   </path>
 
   <!-- keep this one last, it is not an ADE classpath but an Ant classpath -->
@@ -68,14 +62,6 @@ ideas for what  you can do to make your life easier.
   <!-- ====================== -->
   <!-- Private Helper Targets -->
   <!-- ====================== -->
-
-  <target name="scala-init">
-    <taskdef resource="scala/tools/ant/antlib.xml">
-      <classpath>
-        <path refid='base.classpath'/>
-      </classpath>
-    </taskdef>
-  </target>
 
  <target name='init'>
     <mkdir dir='${build.dir}'/>
@@ -152,56 +138,20 @@ ENDHOST</echo>
   <target name='base' depends='init, core' extensionOf='java-only' description='Builds the misc files that used to be in com.'>
     <build-java package.dir='dshafer' classpath='serial.classpath' package.mask='*.java'/>
   </target>
-  <!-- <target name='config' depends='scala-init, java-only, non-java' description='Builds the config files'>
-    <copy file='config/ConfigFile.scala' todir='${superconfig.dir}'/>
-    <delete file='${tmp.dir}/import'/>
-    <echo message='package config; ' file='${tmp.dir}/import'/>
-    <copy todir='${superconfig.dir}'>
-      <fileset dir='${config.dir}'/>
-      <filterchain>
-        <concatfilter prepend='${tmp.dir}/import'/>
-        <replaceregex pattern='^args\s+(.+)$' replace='args ("\1")' flags='gm'/>
-        <replaceregex pattern='^host\s+(.+)$' replace='host ("\1")' flags='gm'/>
-        <replaceregex pattern='^libPath\s+(.+)$' replace='libPath ("\1")' flags='gm'/>
-        <replaceregex pattern='^name\s+(.+)$' replace='name ("\1")' flags='gm'/>
-        <replaceregex pattern='^pause\s+(.+)$' replace='pause (\1)' flags='gm'/>
-        <replaceregex pattern='^registry\s+(.+)$' replace='registry ("\1")' flags='gm'/>
-        <replaceregex pattern='^COMPONENT\s+([\w.]+)$' replace='COMPONENT (classOf[\1])' flags='gm'/>
-      </filterchain>
-      <chainedmapper>
-        <flattenmapper/>
-        <globmapper from='*.superconfig' to='*.scala' casesensitive='no'/>
-      </chainedmapper>
-    </copy>
-    <scalac srcdir='${tmp.dir}' destdir='${build.dir}' includes='config/**/*.scala'
-            deprecation='on' unchecked='on' addparams='-feature'>
-      <classpath>
-        <path refid='ant.classpath' />
-        <path refid='base.classpath' />
-        <path refid='jreality.classpath' />
-        <path refid='jython.classpath' />
-        <path refid='rosade.classpath' />
-      </classpath>
-    </scalac>
-  </target> -->
-  <target name='core' depends='init, scala-init' extensionOf='java-only' description='Builds the core of ADE.'>
-    <build-scala package.dir='${core.dir}'/>
+  <target name='core' depends='init' extensionOf='java-only' description='Builds the core of ADE.'>
     <build-java package.dir='${core.dir}'/>
   </target>
-  <target name='dshafer' depends='init, scala-init, core'
+  <target name='dshafer' depends='init, core'
           extensionOf='java-only' 
           description='Builds dshafer frame code'>
-    <build-scala package.dir='com/dshafer' package.excludes='com/dshafer/**/**Test.scala'/>
     <build-java package.dir='com/dshafer'/>
   </target>
 
-  <target name='dshafer-test' depends='scala-init, init, core,
+  <target name='dshafer-test' depends='init, core,
                                      customTasks, dshafer' extensionOf='test'
           description='Builds some stuff that needs TODO: document
                        me'>
-    <build-scala package.dir='com/dshafer/' classpath='scalatest.classpath'/>
     <build-java package.dir='com/dshafer'/>
-    <test-scala package.dir='com/dshafer' package.dir.dot='com.dshafer'/>
   </target>
   <!-- TODO: when a saner directory structure returns put this back in -->
   <!--<target name='fol' depends='init' extensionOf='java-only' description='Builds the First Order Logic project'>
@@ -222,11 +172,6 @@ ENDHOST</echo>
       <fileset dir='ade/gui' includes='SuperADEGuiPanel.java'/>
     </delete>
   </target>
-
-  <!-- =========================== -->
-  <!-- Private Precondition Checks -->
-  <!-- =========================== -->
-
 
   <!-- =============== -->
   <!-- Building Macros -->
@@ -250,28 +195,9 @@ ENDHOST</echo>
     </sequential>
   </macrodef>
 
-  <macrodef name='build-scala'>
-    <attribute name='classpath' default='base.classpath'/>
-    <attribute name='package.dir' default='NOT SET'/>
-    <attribute name='package.mask' default='**/*.scala'/>
-    <attribute name='package.excludes' default=''/>
-    <sequential>
-      <scalac srcdir='${src.dir}' destdir='${build.dir}'
-              includes='@{package.dir}/@{package.mask}'
-              excludes='@{package.excludes}'
-              deprecation='on'
-              unchecked='on'
-              addparams='-feature'> 
-        <!--  debug='${debug.enabled}' debuglevel='${debug.level}' -->
-        <classpath refid='@{classpath}'/>
-      </scalac>
-    </sequential>
-  </macrodef>
-
   <!-- ================ -->
   <!-- Launching Macros -->
   <!-- ================ -->
-
 
   <!-- Note: this macro is not used in this file, it's here so that it can be shared between
   people's personalized build xml files so that they can more easily set up Netbeans.  Do not delete. -->
@@ -279,14 +205,11 @@ ENDHOST</echo>
   <!-- ================= -->
   <!-- Launching Targets -->
   <!-- ================= -->
-
-
   
   <!-- ================ -->
   <!--  Testing Macros  -->
   <!-- ================ -->
 
-  
   <!-- ================================= -->
   <!--        Test Build Targets         -->
   <!-- ================================= -->
@@ -302,7 +225,5 @@ ENDHOST</echo>
   <!-- ================================= -->
   <!--     Test Launch/Run Targets       -->
   <!-- ================================= -->
-
- 
 
 </project>
