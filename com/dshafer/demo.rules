@@ -1,0 +1,5 @@
+# want(S,bel(self,X)) := hypotheses(bel(self,X),not(bel(self,X)))
+want(S,bel(self,was_looking_for(A,self))) := hypotheses(goalUrgent,goalLow,noGoal); masses(goalUrgent,goalLow)=0.8; masses(goalUrgent,goalLow,noGoal)=0.19; masses(goalUrgent)=0.01; masses(goalLow)=0.001; masses(noGoal)=0.001
+want(S,bel(self,was_looking_for(A,self))) & want(S,bel(self,in(C,L))) := hypotheses(goalUrgent,goalLow,noGoal); masses(goalUrgent,goalLow,noGoal)=0.2; masses(goalUrgent)=0.8; masses(goalLow)=0.001; masses(noGoal)=0.001
+want(S,bel(self,was_looking_for(A,self))) & want(S,bel(self,implies(time(T),at(C,L),usually))) & bel(self,time(T)) := hypotheses(goalUrgent,goalLow,noGoal); masses(goalUrgent,goalLow,noGoal)=0.19; masses(goalUrgent,goalLow)=0.8; masses(goalUrgent)=0.01; masses(goalLow)=0.001; masses(noGoal)=0.001
+want(S,bel(self,was_looking_for(A,self))) & want(S,bel(self,implies(time(T),at(C,L),usually))) := hypotheses(goalUrgent,goalLow,noGoal); masses(goalUrgent,goalLow,noGoal)=0.15; masses(goalUrgent,goalLow)=0.2; masses(goalUrgent)=0.01; masses(goalLow)=0.65; masses(noGoal)=0.001

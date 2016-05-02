@@ -1,0 +1,308 @@
+<?xml version='1.0'?>
+<project name='Dempster Shafer Similarity Measures' default='main' basedir='.'>
+   <description>
+<!-- This description is intentionally dedented, please leave it that way -->
+This is the primary build file for Dempter Shafer Theory.  It contains most of 
+the standard build targets (all, clean, test, main, etc).
+
+For the most part you shouldn't have to edit build.xml.  Obviously if you're
+starting a new project you need to add a target here, please do your part to
+keep the targets in each section alphabetized.
+
+Otherwise, if you're just adding targets for your own convenience (which is a
+good idea) put them in ./anthome/perUserFiles/YOURUSERNAME.xml and they'll be
+automatically included here.  Similarly, if you just want to save some personal
+presets put them in ./anthome/perUserFiles/YOURUSERNAME.properties.  It's also
+a good idea to check out what other people have in those files to give you some
+ideas for what  you can do to make your life easier.
+
+  </description>
+
+  <!-- Load Environment Variables -->
+  <!-- (order matters here) -->
+  <property environment='env'/>
+  <property name='un' value='${user.name}'/>
+  <property name='l' value='127.0.0.1'/>
+  <property name='r' value='127.0.0.1'/>
+  <property name='args' value=''/>
+  <property name='perUserFiles.dir' location='${ant.home}/perUserFiles'/>
+  <property name='user.userConfig.filebase' location='${perUserFiles.dir}/${un}'/>
+  <property file='${user.userConfig.filebase}.properties'/>
+  <property file='build.properties'/>
+  <property name='k' value='${tmp.dir}/${un}.hosts'/>
+  <property name='hosts.file' value='${k}'/>
+
+  <!-- Load Per-User Build XML -->
+  <!-- Note: The XML imported here will actually be appended to the end.  I'm putting the
+  import here because it is logically grouped with loading the environmental variables. -->
+  <import file='${cfg}' optional='true'/>
+  <import file='${user.userConfig.filebase}.xml' optional='true'/>
+
+  <!-- Custom Task Variables -->
+  <property name='customTasks.src.dir' location='${ant.home}/contrib/com'/>
+  <property name='customTasks.dest.dir' location='${ant.home}/lib'/>
+  <property name='ant.library.dir' location='${ant.home}/lib'/>
+
+  <!-- ADE Classpath Setup (note that the Ant classpath is independent and not managed here) -->
+  <path id='ant.classpath'>
+    <path refid='base.classpath'/>
+    <fileset dir='${ant.library.dir}' includes='**/*.jar'/>
+  </path>
+  <path id='base.classpath'>
+    <pathelement path='${build.dir}'/>
+    <pathelement path='${build.lib.dir}/guava-14.0.1.jar'/>
+    <pathelement path='${build.lib.dir}/javaclient2.jar'/>
+    <pathelement path='${build.lib.dir}/jcommon-1.0.16.jar'/>
+    <pathelement path='${build.lib.dir}/scala-compiler.jar'/>
+    <pathelement path='${build.lib.dir}/scala-library.jar'/>
+    <pathelement path='${build.lib.dir}/scala-reflect.jar'/>
+    <pathelement path='${build.lib.dir}/xercesImpl.jar'/>
+    <pathelement path='${build.lib.dir}/xmlunit-1.6.jar'/>
+  </path>
+
+  <!-- keep this one last, it is not an ADE classpath but an Ant classpath -->
+  <path id='customTasks.classpath'>
+    <pathelement path='${ant.library.dir}/ant.jar'/>
+  </path>
+
+  <!-- ====================== -->
+  <!-- Private Helper Targets -->
+  <!-- ====================== -->
+
+  <target name="scala-init">
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <path refid='base.classpath'/>
+      </classpath>
+    </taskdef>
+  </target>
+
+ <target name='init'>
+    <mkdir dir='${build.dir}'/>
+    <mkdir dir='${dist.dir}'/>
+    <mkdir dir='${tmp.dir}'/>
+  </target>
+
+  <target name='customTasks'>
+    <javac srcdir='${customTasks.src.dir}' destdir='${ant.library.dir}' classpathref='customTasks.classpath' failonerror='false'/>
+    <taskdef name='protoc' classname='com.hrilab.Protoc'
+             classpath="${ant.library.dir}"/>
+    <taskdef name="scalatest" classname="org.scalatest.tools.ScalaTestAntTask">
+      <classpath refid="scalatest.classpath"/>
+    </taskdef>  
+  </target>
+
+  <target name='hostsFile' depends='init' unless='hosts.file.exists'>
+    <echo file='${hosts.file}'># auto-generated hosts file
+STARTHOST
+ip ${l}
+os ${os.name}
+javadir ${java.home}
+adehome ${basedir}
+sshlogin ${un}
+ENDHOST</echo>
+  </target>
+
+  <!-- build target extenstion points -->
+  <extension-point name='java-only'/>
+  <extension-point name='non-java'/>
+  
+  <!-- test run target extenstion points -->
+  <extension-point name='test-java-only'/>
+  <extension-point name='test-non-java'/>
+  <extension-point name='test'/> <!-- TODO: remove -->
+
+  <!-- ======================= -->
+  <!-- Standard Public Targets -->
+  <!-- ======================= -->
+
+  <target name='all' depends='java-only,non-java,post-build-cleanup' description='Build everything!'/>
+
+  <target name='java' depends='java-only' description='Builds all of the java in ADE'/>
+  
+  <target name='main' depends='java, post-build-cleanup' description='The default build if you simply run ./ant'/>
+
+  <target name='test-all' depends='test-java-only, test-non-java' description='Runs all the unit tests that are extensions of test-java-only and test-non-java.'/>
+
+  <target name='test-java' depends='test-java-only' description='Runs all the unit tests that are extensions of test-java-only.'/>
+  
+  <target name='clean' description='Removes all files and directories created by Ant during any build(s).'>
+    <delete dir='${ant.library.dir}/com'/>
+    <delete dir='${build.dir}'/>
+    <delete dir='${dist.dir}'/>
+    <delete dir='${superconfig.dir}'/>
+    <delete dir='${tmp.dir}'/>
+    <delete dir='${core.dir}/configFiles'/>
+    <delete file='${core.dir}/Connection.java'/>
+    <delete file='${core.dir}/InitialSetupCallback.java'/>
+    <delete file='${core.dir}/SuperADEComponent.java'/>
+    <delete file='${core.dir}/SuperADEComponentImpl.java'/>
+    <delete file='${core.dir}/SuperADERegistry.java'/>
+    <delete file='${core.dir}/SuperADERegistryImpl.java'/>
+    <delete file='${core.dir}/gui/SuperADEGuiPanel.java'/>
+  </target>
+  
+  <target name='dsjar' depends='main' description='Creates jar from everything in build dir.'>
+    <jar destfile="${dist.dir}/DS.jar" basedir="${build.dir}"/>
+  </target>
+
+  <!-- ========================== -->
+  <!-- Individual Project Targets -->
+  <!-- ========================== -->
+  <target name='base' depends='init, core' extensionOf='java-only' description='Builds the misc files that used to be in com.'>
+    <build-java package.dir='dshafer' classpath='serial.classpath' package.mask='*.java'/>
+  </target>
+  <!-- <target name='config' depends='scala-init, java-only, non-java' description='Builds the config files'>
+    <copy file='config/ConfigFile.scala' todir='${superconfig.dir}'/>
+    <delete file='${tmp.dir}/import'/>
+    <echo message='package config; ' file='${tmp.dir}/import'/>
+    <copy todir='${superconfig.dir}'>
+      <fileset dir='${config.dir}'/>
+      <filterchain>
+        <concatfilter prepend='${tmp.dir}/import'/>
+        <replaceregex pattern='^args\s+(.+)$' replace='args ("\1")' flags='gm'/>
+        <replaceregex pattern='^host\s+(.+)$' replace='host ("\1")' flags='gm'/>
+        <replaceregex pattern='^libPath\s+(.+)$' replace='libPath ("\1")' flags='gm'/>
+        <replaceregex pattern='^name\s+(.+)$' replace='name ("\1")' flags='gm'/>
+        <replaceregex pattern='^pause\s+(.+)$' replace='pause (\1)' flags='gm'/>
+        <replaceregex pattern='^registry\s+(.+)$' replace='registry ("\1")' flags='gm'/>
+        <replaceregex pattern='^COMPONENT\s+([\w.]+)$' replace='COMPONENT (classOf[\1])' flags='gm'/>
+      </filterchain>
+      <chainedmapper>
+        <flattenmapper/>
+        <globmapper from='*.superconfig' to='*.scala' casesensitive='no'/>
+      </chainedmapper>
+    </copy>
+    <scalac srcdir='${tmp.dir}' destdir='${build.dir}' includes='config/**/*.scala'
+            deprecation='on' unchecked='on' addparams='-feature'>
+      <classpath>
+        <path refid='ant.classpath' />
+        <path refid='base.classpath' />
+        <path refid='jreality.classpath' />
+        <path refid='jython.classpath' />
+        <path refid='rosade.classpath' />
+      </classpath>
+    </scalac>
+  </target> -->
+  <target name='core' depends='init, scala-init' extensionOf='java-only' description='Builds the core of ADE.'>
+    <build-scala package.dir='${core.dir}'/>
+    <build-java package.dir='${core.dir}'/>
+  </target>
+  <target name='dshafer' depends='init, scala-init, core'
+          extensionOf='java-only' 
+          description='Builds dshafer frame code'>
+    <build-scala package.dir='com/dshafer' package.excludes='com/dshafer/**/**Test.scala'/>
+    <build-java package.dir='com/dshafer'/>
+  </target>
+
+  <target name='dshafer-test' depends='scala-init, init, core,
+                                     customTasks, dshafer' extensionOf='test'
+          description='Builds some stuff that needs TODO: document
+                       me'>
+    <build-scala package.dir='com/dshafer/' classpath='scalatest.classpath'/>
+    <build-java package.dir='com/dshafer'/>
+    <test-scala package.dir='com/dshafer' package.dir.dot='com.dshafer'/>
+  </target>
+  <!-- TODO: when a saner directory structure returns put this back in -->
+  <!--<target name='fol' depends='init' extensionOf='java-only' description='Builds the First Order Logic project'>
+    <build-java package.dir='com' package.mask='*.java'/>
+  </target>-->
+
+  <!-- ===================== -->
+  <!-- Private Build Targets -->
+  <!-- ===================== -->
+
+  <!-- =========================== -->
+  <!-- Private Clean Targets       -->
+  <!-- =========================== -->
+
+  <target name='post-build-cleanup'>
+    <delete quiet='true'>
+      <fileset dir='ade' includes='Connection.java,SuperADEComponentImpl.java'/>
+      <fileset dir='ade/gui' includes='SuperADEGuiPanel.java'/>
+    </delete>
+  </target>
+
+  <!-- =========================== -->
+  <!-- Private Precondition Checks -->
+  <!-- =========================== -->
+
+
+  <!-- =============== -->
+  <!-- Building Macros -->
+  <!-- =============== -->
+  <macrodef name='build-java'>
+    <attribute name='classpath' default='base.classpath'/>
+    <attribute name='package.dir' default='NOT SET'/>
+    <attribute name='package.mask' default='**/*.java'/>
+    <attribute name='package.excludes' default=''/>
+    <sequential>
+      <javac srcdir='${src.dir}'
+             destdir='${build.dir}'
+             includes='@{package.dir}/@{package.mask}'
+             excludes='@{package.excludes}'
+             debug='${debug.enabled}'
+             debuglevel='${debug.level}'
+             deprecation='on'>
+        <classpath refid='@{classpath}'/>
+        <!-- <compilerarg value="-Xlint"/> -->
+      </javac>
+    </sequential>
+  </macrodef>
+
+  <macrodef name='build-scala'>
+    <attribute name='classpath' default='base.classpath'/>
+    <attribute name='package.dir' default='NOT SET'/>
+    <attribute name='package.mask' default='**/*.scala'/>
+    <attribute name='package.excludes' default=''/>
+    <sequential>
+      <scalac srcdir='${src.dir}' destdir='${build.dir}'
+              includes='@{package.dir}/@{package.mask}'
+              excludes='@{package.excludes}'
+              deprecation='on'
+              unchecked='on'
+              addparams='-feature'> 
+        <!--  debug='${debug.enabled}' debuglevel='${debug.level}' -->
+        <classpath refid='@{classpath}'/>
+      </scalac>
+    </sequential>
+  </macrodef>
+
+  <!-- ================ -->
+  <!-- Launching Macros -->
+  <!-- ================ -->
+
+
+  <!-- Note: this macro is not used in this file, it's here so that it can be shared between
+  people's personalized build xml files so that they can more easily set up Netbeans.  Do not delete. -->
+
+  <!-- ================= -->
+  <!-- Launching Targets -->
+  <!-- ================= -->
+
+
+  
+  <!-- ================ -->
+  <!--  Testing Macros  -->
+  <!-- ================ -->
+
+  
+  <!-- ================================= -->
+  <!--        Test Build Targets         -->
+  <!-- ================================= -->
+   
+  <target name='core-test' depends='init, core' description='Build common classes useful for writing component and integration tests.'>
+    <build-java package.dir='test/ade'  classpath='omni.classpath'/>
+  </target>
+  
+  <target name='demo-test' depends='init, core' description='Build all demo testing components.'>
+    <build-java package.dir='test/com/demos'  classpath='omni.classpath'/>
+  </target>
+
+  <!-- ================================= -->
+  <!--     Test Launch/Run Targets       -->
+  <!-- ================================= -->
+
+ 
+
+</project>
