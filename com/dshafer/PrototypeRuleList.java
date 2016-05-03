@@ -6,7 +6,7 @@ package com.dshafer;
 
 import java.util.ArrayList;
 import com.*;
-import com.slug.dialogue.prag.PragUtil;
+import com.dshafer.PragUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
