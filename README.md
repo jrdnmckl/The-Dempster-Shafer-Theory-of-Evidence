@@ -17,3 +17,16 @@ export PATH=$ANT_HOME/bin:$PATH
 Once ANT is installed and you've changed your Ant Home environment your work is done.
 
 Run the command ./ant dsjar to get a JAR of all the source code included. 
+
+After receiving the Dempster-Shafer JAR, move to your terminal and compile the source code in the jar by running the following command:
+```
+./ant utilities dshafer
+```
+If you need to compile any unit tests run the following:
+```
+./ant run-junit-test -Dname=com.dshafer.similarity_measures.NAME_OF_TEST_FILE
+
+EXAMPLE:
+./ant run-junit-test -Dname=com.dshafer.similarity_measures.CosineTest
+```
+This will give you feedback and allow you to automate some testing with specific files.
