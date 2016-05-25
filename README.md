@@ -5,9 +5,9 @@ This repo is an extension of the research I've been completing during my senior 
   - If you're using Unix/Windows, download a binary distribution of ANT [here](http://ant.apache.org/bindownload.cgi), then choose a mirror and download the zip (zip is the easiest method to set). 
   Unzip the file on your computer, then copy the path (traverse until the bin folder). 
   Next, you'll need to set up an environment variable. 
-    * In your bash_profile, Set ANT_HOME = installation path (the path you've just copied) and save. 
-    * Now execute, echo $ANT_HOME and $JAVA_HOME respectively. You should see the result as your installation path. 
-    * Before compiling any of the provided source code, you'll need to change your anthome environment in your bash script. 
+  In your bash_profile, Set ANT_HOME = installation path (the path you've just copied) and save. 
+  Now execute, echo $ANT_HOME and $JAVA_HOME respectively. You should see the result as your installation path. 
+  Before compiling any of the provided source code, you'll need to change your anthome environment in your bash script. 
 Include the following in your bash_profile (UNIX) or follow the instructions from this [link](https://docs.oracle.com/cd/E19316-01/820-7054/gicjc/index.html) to change anthome: 
 ```
 export ANT_HOME=/opt/apache-ant-1.9.7
