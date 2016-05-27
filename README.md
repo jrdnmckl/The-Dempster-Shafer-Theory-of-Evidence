@@ -12,7 +12,7 @@ export ANT_HOME=/opt/apache-ant-1.9.7
 export PATH=$ANT_HOME/bin:$PATH
 ```
 
-Once ANT is installed and you've changed your Ant Home environment your work is done. Run the command ``` ant dsjar ``` to get a JAR of all the source code included. The JAR should appear in the ** dist/ ** folder in the main directory. After receiving the *DS.jar* file , move to your terminal and compile the source code in the jar by running the following command:
+Once ANT is installed and you've changed your Ant Home environment your work is done. Run the command ``` ant dsjar ``` to get a JAR of all the source code included. The JAR should appear in the **dist/** folder in the main directory. After receiving the **DS.jar** file , move to your terminal and compile the source code in the jar by running the following command:
 
 ```
 ant utilities dshafer
@@ -25,3 +25,7 @@ EXAMPLE:
 ant run-junit-test -Dname=com.dshafer.similarity_measures.CosineTest
 ```
 This will give you feedback and allow you to automate some testing with specific files.
+
+## CODE EXAMPLE
+
+
