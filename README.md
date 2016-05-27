@@ -1,4 +1,4 @@
-# DempsterShafer
+# Dempster - Shafer
 
 This repo is an extension of the research I've been completing during my senior year Cognitive & Brain Science Seminar at Tufts University. This research focuses on Dempster-Shafer's Evidence Theory and the different similarity measures used to compare two separate bodies of evidence (BoE's). I've implemented this java library for further use in the research and development of embodied cognitive systems. In order to compile these files I've provided, you'll need to have the latest version of Apache Ant installed. 
   - If you're using a Linux machine, open a terminal window and type the following in the command line: "sudo apt-get install ant" and then follow the instructions. 
@@ -12,7 +12,7 @@ export ANT_HOME=/opt/apache-ant-1.9.7
 export PATH=$ANT_HOME/bin:$PATH
 ```
 
-Once ANT is installed and you've changed your Ant Home environment your work is done. Run the command ``` ant dsjar ``` to get a JAR of all the source code included. The JAR should appear in the **dist/** folder in the main directory. After receiving the **DS.jar** file , move to your terminal and compile the source code in the jar by running the following command:
+Once ANT is installed and you've changed your Ant Home environment your work is done. Run the command ``` ant dsjar ``` to get a JAR of all the source code included. The JAR should appear in the ** dist/ ** folder in the main directory. After receiving the *DS.jar* file , move to your terminal and compile the source code in the jar by running the following command:
 
 ```
 ant utilities dshafer
@@ -26,6 +26,30 @@ ant run-junit-test -Dname=com.dshafer.similarity_measures.CosineTest
 ```
 This will give you feedback and allow you to automate some testing with specific files.
 
-### CODE EXAMPLE
+## CODE EXAMPLE
+If you wanted to write your own similarity measure, all you really need is a computeSimilarity function that coincides with the
+super class:
+```
+public class AwesomeSimMeasure extends SimilarityMeasure {
+    public abstract double computeSimilarity(DSFrame s1, DSFrame s2){
+    /* important calculations go here */
+    }
+}
+```
+
+In order to determine if your newly created class works like it should, you'll want to create a test class with the same name as your class, plus "Test" at the end as a simple convention. Unit test using any methods you see fit, but note that DS Frames are meant to compare the differences between two strings...
+
+```
+public class AwesomeSimMeasureTest {
+
+@Test
+  public void superUsefulTestingMethod(){
+    SimilarityMeasure simMeasure = new AwesomeSimMeasure();
+    DSFrame frame = new DSFrame();
+    DSFrame frame2 = new DSFrame();
+  }
+}
+
+
 
 
