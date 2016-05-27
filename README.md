@@ -26,6 +26,6 @@ ant run-junit-test -Dname=com.dshafer.similarity_measures.CosineTest
 ```
 This will give you feedback and allow you to automate some testing with specific files.
 
-## CODE EXAMPLE
+### CODE EXAMPLE
 
 
