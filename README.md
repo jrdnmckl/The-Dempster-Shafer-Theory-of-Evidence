@@ -27,8 +27,7 @@ ant run-junit-test -Dname=com.dshafer.similarity_measures.CosineTest
 This will give you feedback and allow you to automate some testing with specific files.
 
 ## CODE EXAMPLE
-If you wanted to write your own similarity measure, all you really need is a computeSimilarity function that coincides with the
-super class:
+If you wanted to write your own similarity measure, all you really need is to write a class which extends SimilarityMeasure. 
 ```
 public class AwesomeSimMeasure extends SimilarityMeasure {
     public abstract double computeSimilarity(DSFrame s1, DSFrame s2){
@@ -37,16 +36,43 @@ public class AwesomeSimMeasure extends SimilarityMeasure {
 }
 ```
 
-In order to determine if your newly created class works like it should, you'll want to create a test class with the same name as your class, plus "Test" at the end as a simple convention. Unit test using any methods you see fit, but note that DS Frames are meant to compare the differences between two strings...
+In order to determine if your newly created class works like it should, you'll want to create a test class with the same name as your class, plus "Test" at the end as a simple convention. Unit test using any methods you see fit, but note that the DS Frame operator is assumed to operate on vectors of masses...
 
 ```
 public class AwesomeSimMeasureTest {
 
 @Test
   public void superUsefulTestingMethod(){
-    SimilarityMeasure simMeasure = new AwesomeSimMeasure();
+    
+    double alpha = 0.8;
+    double beta = 0.2;
+    double gamma = 0.6;
+    double delta = 0.4;
+
+    double coefficient;
+    SimilarityMeasure sm = new AwesomeSimMeasure();
+
     DSFrame frame = new DSFrame();
     DSFrame frame2 = new DSFrame();
+
+    frame.constructFrame("AnotherWayofThinking", "SomeOtherBelief");
+    frame.clearMasses();
+    frame.setMass(alpha, "AnotherWayofThinking");
+    frame.setMass(beta, "SomeOtherBelief");
+    frame.setMass((alpha - beta), "AnotherWayofThinking", "SomeOtherBelief");
+    frame.normalizeMasses();
+
+    frame2.constructFrame("AnIdea", "SomeOtherBelief");
+    frame2.clearMasses();
+    frame2.setMass(gamma, "AnIdea");
+    frame2.setMass(delta, "SomeOtherBelief");
+    frame2.setMass((gamma - delta), "AnIdea", "SomeOtherBelief");
+    frame2.normalizeMasses();
+
+    coefficient = sm.computeSimilarity(frame, frame2);
+    Assert.assertThat(frame.getHypotheses(), hasItems("SomeOtherBelief", "AnotherWayofThinking"));
+    Assert.assertThat(frame2.getHypotheses(), hasItems("AnIdea", "SomeOtherBelief"));
+    System.out.println(frame);
   }
 }
 
